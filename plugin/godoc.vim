@@ -113,18 +113,22 @@ function! s:Godoc(...)
   if !len(words)
     return
   endif
-  if s:GodocWord(words[0])
-    if len(words) > 1
-      if search('^\%(const\|var\|type\|\s\+\) ' . words[1] . '\s\+=\s')
-        return
-      endif
-      if search('^func ' . words[1] . '(')
-        silent! normal zt
-        return
-      endif
-      echo 'No documentation found for "' . words[1] . '".'
-    endif
+  if !s:GodocWord(words[0])
+    return
   endif
+  if len(words) < 2
+    return
+  endif
+
+  if search('^\%(const\|var\|type\) ' . words[1] . ' ') ||
+   \ search('^func \%(([^)]\+)\)\? \?' . words[1] . '(') ||
+   \ search('^\%(const\|var\|type\) ' . words[1]) ||
+   \ search('^func \%(([^)]\+)\)\? \?' . words[1])
+    silent! normal zt
+  else
+    echo 'No documentation found for "' . words[1] . '".'
+  endif
+
 endfunction
 
 " vim:ts=4:sw=4:et
